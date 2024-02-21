@@ -2,9 +2,7 @@ package com.example.BankApp.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -14,25 +12,30 @@ import java.util.Set;
 @Entity
 @Data
 @Table(name = "users")
-@NoArgsConstructor
+
 public class User implements UserDetails {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
     private String password;
 
 
     @ManyToOne
+    @JoinColumn(name = "bank_account_id")
     private BankAccount bankAccount;
-    @Transient
-    private final Set<GrantedAuthority> authorities = new HashSet<>();
-    public User(Long id, String username, String password, BankAccount bankAccount) {
-        super();
-        authorities.add(new SimpleGrantedAuthority("USER"));
+    @OneToMany
+    private Set<Role> authorities;
+    public User(Long id, String username, String password, BankAccount bankAccount, Set<Role> authorities) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.bankAccount = bankAccount;
+        this.authorities = authorities;
+    }
+    public User() {
+        super();
+        this.authorities = new HashSet<Role>();
     }
 
 
@@ -41,7 +44,7 @@ public class User implements UserDetails {
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return this.authorities;
     }
 
     /**

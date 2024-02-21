@@ -1,28 +1,39 @@
 package com.example.BankApp.service;
 
-import com.example.BankApp.models.RegistrationPayload;
 import com.example.BankApp.models.User;
 import com.example.BankApp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
  @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    private PasswordEncoder encoder;
-
-    public User registerUser(RegistrationPayload user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already taken");
-        }
-        String encodedPassword = encoder.encode(user.getPassword());
-        User newUser = new User();
-        newUser.setUsername(user.getUsername());
-        newUser.setPassword(encodedPassword);
-        return userRepository.save(newUser);
+    /**
+     * @param username
+     * @return
+     * @throws UsernameNotFoundException
+     */
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }
+
+    public User getCurrentUser() { //Hämtar inloggad användare
+        //skapar en variabel som hämtar inloggad användare
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        //hämtar användaren från databasen
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        //returnerar användaren
+        return userOptional.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    }
+
 }

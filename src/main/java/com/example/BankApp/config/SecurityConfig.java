@@ -52,8 +52,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
 
-                    auth.requestMatchers(HttpMethod.POST, "/user/**").permitAll();
-                    auth.requestMatchers("/todo/**  ").hasAnyRole("USER", "ADMIN");
+                    auth.requestMatchers(HttpMethod.POST, "bank/user/**").permitAll();
                     auth.anyRequest().authenticated();
 
 
