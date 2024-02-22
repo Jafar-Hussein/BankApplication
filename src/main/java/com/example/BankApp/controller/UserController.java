@@ -23,4 +23,14 @@ public class UserController {
         return authService.register(registrationPayload);
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody RegistrationPayload registrationPayload) {
+        if (registrationPayload.getUsername() == null || registrationPayload.getPassword() == null) {
+            return ResponseEntity.badRequest().body("Error: Username or password is null!");
+        }
+        return authService.login(registrationPayload.getUsername(), registrationPayload.getPassword());
+    }
+
+
+
 }

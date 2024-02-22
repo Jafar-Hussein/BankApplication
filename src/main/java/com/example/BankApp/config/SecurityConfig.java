@@ -53,6 +53,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
 
                     auth.requestMatchers(HttpMethod.POST, "bank/user/**").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "bank/transaction/**").permitAll();
                     auth.anyRequest().authenticated();
 
 
